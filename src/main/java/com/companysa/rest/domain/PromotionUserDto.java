@@ -1,6 +1,5 @@
 package com.companysa.rest.domain;
 
-import com.companysa.rest.domain.exception.NotAgreeWithTermsAndConditionsException;
 import com.companysa.usecase.domain.PromotionUser;
 
 public class PromotionUserDto {
@@ -18,7 +17,7 @@ public class PromotionUserDto {
 		promotionUserDto.setAddress(promotionUser.address());
 		promotionUserDto.setCity(promotionUser.city());
 		promotionUserDto.setEmailAddress(promotionUser.emailAddress());
-		promotionUserDto.setTermsAndConditions(promotionUser.isTermsAndConditions());
+		promotionUserDto.setTermsAndConditions(promotionUser.isAgreeWithTermsAndConditions());
 		return promotionUserDto;
 	}
 
@@ -68,12 +67,6 @@ public class PromotionUserDto {
 
 	public void setTermsAndConditions(boolean termsAndConditions) {
 		this.termsAndConditions = termsAndConditions;
-	}
-
-	public void validate() {
-		if (!isTermsAndConditions()) {
-			throw new NotAgreeWithTermsAndConditionsException();
-		}
 	}
 
 	public PromotionUser toDomain() {

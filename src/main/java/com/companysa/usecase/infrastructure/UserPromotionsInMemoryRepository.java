@@ -4,24 +4,27 @@ import com.companysa.usecase.domain.PromotionUser;
 import com.companysa.usecase.domain.UserPromotionsRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository
 public class UserPromotionsInMemoryRepository implements UserPromotionsRepository {
 
-	private final static List<PromotionUser> promotionUsers = new ArrayList<>();
+	private final static Map<String, PromotionUser> promotionUsers = new HashMap<>();
 
 	@Override
 	public void signInWith(final PromotionUser user) {
-		promotionUsers.add(user);
+		promotionUsers.put(user.uid(), user);
 	}
 
 	@Override
-	public Optional<PromotionUser> userDetails(final String userEmail) {
-		return promotionUsers.stream()
-			.filter(user -> userEmail.equals(user.emailAddress()))
-			.findFirst();
+	public Optional<PromotionUser> userDetailsByUid(final String userUid) {
+		return Optional.ofNullable(promotionUsers.get(userUid));
+	}
+
+	@Override
+	public void updateUser(PromotionUser user) {
+		promotionUsers.put(user.uid(), user);
 	}
 }

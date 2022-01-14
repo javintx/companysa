@@ -1,29 +1,44 @@
 package com.companysa.usecase.domain;
 
+import com.companysa.usecase.domain.exception.NotAgreeWithTermsAndConditions;
+
+import java.util.UUID;
+
 public class PromotionUser {
+	private final String UID;
 	private final String name;
 	private final String lastName;
 	private final String address;
 	private final String city;
 	private final String emailAddress;
-	private final boolean termsAndConditions;
+	private final boolean agreeWithTermsAndConditions;
 
-	private PromotionUser(final String name,
+	private PromotionUser(final String UID,
+						  final String name,
 						  final String lastName,
 						  final String address,
 						  final String city,
 						  final String emailAddress,
-						  final boolean termsAndConditions) {
+						  final boolean agreeWithTermsAndConditions) {
+		this.UID = UID;
 		this.name = name;
 		this.lastName = lastName;
 		this.address = address;
 		this.city = city;
 		this.emailAddress = emailAddress;
-		this.termsAndConditions = termsAndConditions;
+		this.agreeWithTermsAndConditions = agreeWithTermsAndConditions;
 	}
 
 	public static PromotionUserBuilder builder() {
 		return new PromotionUserBuilder();
+	}
+
+	public static PromotionUserBuilder updater(final PromotionUser promotionUser) {
+		return new PromotionUserBuilder(promotionUser);
+	}
+
+	public String uid() {
+		return UID;
 	}
 
 	public String name() {
@@ -46,17 +61,38 @@ public class PromotionUser {
 		return emailAddress;
 	}
 
-	public boolean isTermsAndConditions() {
-		return termsAndConditions;
+	public boolean isAgreeWithTermsAndConditions() {
+		return agreeWithTermsAndConditions;
+	}
+
+	public void validate() {
+		if (!isAgreeWithTermsAndConditions()) {
+			throw new NotAgreeWithTermsAndConditions();
+		}
 	}
 
 	public static class PromotionUserBuilder {
+		private final String uid;
 		private String name;
 		private String lastName;
 		private String address;
 		private String city;
 		private String emailAddress;
-		private boolean termsAndConditions;
+		private boolean agreeWithTermsAndConditions;
+
+		private PromotionUserBuilder() {
+			this.uid = UUID.randomUUID().toString();
+		}
+
+		private PromotionUserBuilder(final PromotionUser promotionUser) {
+			this.uid = promotionUser.uid();
+			this.name = promotionUser.name();
+			this.lastName = promotionUser.lastName();
+			this.address = promotionUser.address();
+			this.city = promotionUser.city();
+			this.emailAddress = promotionUser.emailAddress();
+			this.agreeWithTermsAndConditions = promotionUser.isAgreeWithTermsAndConditions();
+		}
 
 		public PromotionUserBuilder withName(String name) {
 			this.name = name;
@@ -84,12 +120,16 @@ public class PromotionUser {
 		}
 
 		public PromotionUserBuilder agreeWithTermsAndConditions(boolean termsAndConditions) {
-			this.termsAndConditions = termsAndConditions;
+			this.agreeWithTermsAndConditions = termsAndConditions;
 			return this;
 		}
 
 		public PromotionUser newUser() {
-			return new PromotionUser(name, lastName, address, city, emailAddress, termsAndConditions);
+			return new PromotionUser(uid, name, lastName, address, city, emailAddress, agreeWithTermsAndConditions);
+		}
+
+		public PromotionUser updateUser() {
+			return new PromotionUser(uid, name, lastName, address, city, emailAddress, agreeWithTermsAndConditions);
 		}
 	}
 }

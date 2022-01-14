@@ -18,10 +18,16 @@ public class UserPromotionsUseCase {
 	}
 
 	public void signInWith(final PromotionUser user) {
+		user.validate();
 		userPromotionsRepository.signInWith(user);
 	}
 
-	public Optional<PromotionUser> userDetails(String userEmail) {
-		return userPromotionsRepository.userDetails(userEmail);
+	public Optional<PromotionUser> userDetailsByUid(final String userUid) {
+		return userPromotionsRepository.userDetailsByUid(userUid);
+	}
+
+	public PromotionUser updateUserDetails(final PromotionUser user) {
+		userPromotionsRepository.updateUser(user);
+		return user;
 	}
 }

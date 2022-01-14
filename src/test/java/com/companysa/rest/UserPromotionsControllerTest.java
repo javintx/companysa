@@ -1,7 +1,8 @@
 package com.companysa.rest;
 
 import com.companysa.Application;
-import com.companysa.rest.domain.exception.NotAgreeWithTermsAndConditionsException;
+import com.companysa.usecase.domain.exception.NotAgreeWithTermsAndConditions;
+import org.hamcrest.core.StringStartsWith;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,7 @@ public class UserPromotionsControllerTest {
 		mvc.perform(post("/promotions/signInWith")
 				.contentType(MediaType.APPLICATION_JSON).content(validUser()))
 			.andExpect(status().isOk())
-			.andExpect(content().string("SignInWth: userName"));
+			.andExpect(content().string(StringStartsWith.startsWith("SignInWth: ")));
 	}
 
 	@Test
@@ -37,14 +38,23 @@ public class UserPromotionsControllerTest {
 		mvc.perform(post("/promotions/signInWith")
 				.contentType(MediaType.APPLICATION_JSON).content(userWithoutTermsAndConditionsChecked()))
 			.andExpect(status().isBadRequest())
-			.andExpect(result -> assertTrue(result.getResolvedException() instanceof NotAgreeWithTermsAndConditionsException));
+			.andExpect(result -> assertTrue(result.getResolvedException() instanceof NotAgreeWithTermsAndConditions));
 	}
 
-//	@Test
-//	public void testUserDetailsNotFound() throws Exception {
-//		mvc.perform(get("/promotions/userDetails/user_email@address.com"))
-//			.andExpect(status().isNotFound());
-//	}
+	@Test
+	public void testUserDetailsNotFound() throws Exception {
+		mvc.perform(get("/promotions/userDetails/user_email@address.com"))
+			.andExpect(status().isNotFound());
+	}
+
+	@Test
+	public void testUserDetailsFound() throws Exception {
+		String newUserUid = mvc.perform(post("/promotions/signInWith")
+				.contentType(MediaType.APPLICATION_JSON).content(validUser()))
+			.andReturn().getResponse().getContentAsString().replaceFirst("SignInWth: ", "");
+		mvc.perform(get("/promotions/userDetails/" + newUserUid))
+			.andExpect(status().isOk());
+	}
 
 	private String validUser() throws JSONException {
 		return userJson()
