@@ -2,6 +2,7 @@ package com.companysa.rest;
 
 import com.companysa.rest.domain.PromotionUserDto;
 import com.companysa.usecase.UserPromotionsUseCase;
+import com.companysa.usecase.domain.PromotionUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,18 +27,18 @@ public class UserPromotionsController {
 	@PostMapping(value = "/promotions/signInWith", consumes = {MediaType.APPLICATION_JSON_VALUE})
 	@ResponseStatus(HttpStatus.OK)
 	public String signInWith(@RequestBody PromotionUserDto user) {
-		user.validate();
-		userPromotionsUseCase.signInWith(user.toDomain());
-		return signedWith(user);
+		PromotionUser promotionUser = user.toDomain();
+		userPromotionsUseCase.signInWith(promotionUser);
+		return signedWith(promotionUser);
 	}
 
-	private String signedWith(final PromotionUserDto user) {
-		return String.format("SignInWth: %s", user.getName());
+	private String signedWith(final PromotionUser user) {
+		return String.format("SignInWth: %s", user.uid());
 	}
 
-	@GetMapping(value = "/promotions/userDetails/{userEmail}", produces = {MediaType.APPLICATION_JSON_VALUE})
-	public ResponseEntity<PromotionUserDto> userDetails(@PathVariable String userEmail) {
-		return userPromotionsUseCase.userDetails(userEmail)
+	@GetMapping(value = "/promotions/userDetails/{userUid}", produces = {MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<PromotionUserDto> userDetailsByUid(@PathVariable String userUid) {
+		return userPromotionsUseCase.userDetailsByUid(userUid)
 			.map(user -> ResponseEntity.ok(PromotionUserDto.fromDomain(user)))
 			.orElseGet(() -> ResponseEntity.notFound().build());
 	}

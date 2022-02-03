@@ -8,5 +8,7 @@ import java.util.Optional;
 public interface UserPromotionsRepository {
 	void signInWith(final PromotionUser user);
 
-	Optional<PromotionUser> userDetails(final String userEmail);
+	Optional<PromotionUser> userDetailsByUid(final String userUid);
+
+	void updateUser(final PromotionUser user);
 }
